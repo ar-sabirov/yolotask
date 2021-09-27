@@ -1,3 +1,5 @@
+from typing import Dict
+
 from pydantic import BaseModel, Field
 
 
@@ -8,3 +10,9 @@ class RequestModel(BaseModel):
     platform: str = Field(..., alias="Platform")
     user_name: str = Field(..., alias="User name")
     country_code: str = Field(..., alias="Country code")
+
+
+class StatsResponseModel(BaseModel):
+    ad_requests: Dict[str, int]
+    impressions: Dict[str, int]
+    fill_rate: Dict[str, float]
