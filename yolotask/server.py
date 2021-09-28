@@ -4,7 +4,7 @@ from functools import partial
 from typing import Optional
 
 import aiohttp
-from fastapi import FastAPI, Query, status
+from fastapi import FastAPI, Query, status, Response
 
 from yolotask.config import settings
 from yolotask.db.storages import RedisStorage
@@ -27,13 +27,11 @@ async def shutdown():
 
 @app.post("/GetAd", status_code=status.HTTP_200_OK)
 async def get_ad(body: RequestModel):
-    #res = "Hey"
-    # TODO uncomment this
     async with aiohttp.ClientSession() as session:
         async with session.get(settings.resource_url) as resp:
             res = await resp.text()
     await app.state.db.save_request(body)
-    return res
+    return Response(media_type='application/xml', content=res)
 
 
 @app.post("/Impression", status_code=status.HTTP_200_OK)

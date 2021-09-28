@@ -23,7 +23,7 @@ class MockResponse:
 
 @pytest.mark.asyncio
 async def test_root(mocker):
-    msg = json.dumps({'message': 'Hi from mock'})
+    msg = "<is>it how xml<looks>?"
     resp = MockResponse(msg, 200)
     mocker.patch("aiohttp.ClientSession.get", return_value=resp)
 
@@ -37,3 +37,4 @@ async def test_root(mocker):
     async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
         response = await client.post("/GetAd", json=data)
     assert response.status_code == 200
+    assert response.text == msg
