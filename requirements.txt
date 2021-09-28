@@ -1,0 +1,8 @@
+fastapi
+aiohttp
+aioredis
+pytest-asyncio
+uvicorn[standard]
+httpx
+pytest-mock
+asgi_lifespan
