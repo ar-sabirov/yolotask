@@ -1,40 +1,27 @@
-from abc import ABCMeta
-
 import aioredis
 from yolotask.models import RequestModel
 
 
-class AbstractStorage(metaclass=ABCMeta):
-    async def save_request(user_id):
-        pass
-
-    async def save_impression():
-        pass
-
-
-class RedisStorage(AbstractStorage):
+class RedisStorage:
     def __init__(self, url: str) -> None:
-        self.redis_client: aioredis.Redis = None
+        self.redis: aioredis.Redis = None
         self.url = url
 
     async def connect(self):
-        self.redis_client: aioredis.Redis = await aioredis.from_url(
-            self.url,
-            encoding="utf-8",
-            decode_responses=True,
-        )
+        pool = aioredis.ConnectionPool.from_url(self.url, max_connections=10)
+        self.redis: aioredis.Redis = aioredis.Redis(connection_pool=pool)
 
     async def close(self):
-        self.redis_client.close()
-        await self.redis_client.wait_closed()
+        await self.redis.close()
+        #await self.redis.wait_closed()
 
     async def save_request(self, request: RequestModel):
-        await self.redis_client.hincrby("user_requests", f"{request.user_name}")
-        await self.redis_client.hincrby("sdk_requests", f"{request.sdk_version}")
+        await self.redis.hincrby("user_requests", f"{request.user_name}")
+        await self.redis.hincrby("sdk_requests", f"{request.sdk_version}")
 
     async def save_impression(self, request: RequestModel):
-        await self.redis_client.hincrby("user_impressions", f"{request.user_name}")
-        await self.redis_client.hincrby("sdk_impressions", f"{request.sdk_version}")
+        await self.redis.hincrby("user_impressions", f"{request.user_name}")
+        await self.redis.hincrby("sdk_impressions", f"{request.sdk_version}")
 
     async def get_stats(self, agg: str):
 
@@ -47,10 +34,10 @@ class RedisStorage(AbstractStorage):
         data = {}
         cur = b"0"  # set initial cursor to 0
         while cur:
-            cur, keys = await self.redis_client.hscan(name, cur)
+            cur, keys = await self.redis.hscan(name, cur)
             if not keys:
                 return data
-            values = await self.redis_client.hmget(name, keys)
+            values = await self.redis.hmget(name, keys)
             values = map(int, values)
             data.update(dict(zip(keys, values)))
 
