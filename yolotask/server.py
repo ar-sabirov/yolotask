@@ -4,7 +4,7 @@ from functools import partial
 from typing import Optional
 
 import aiohttp
-from fastapi import FastAPI, Query, status, Response
+from fastapi import FastAPI, Query, Response, status
 
 from yolotask.config import settings
 from yolotask.db.redis_storage import RedisStorageClient
