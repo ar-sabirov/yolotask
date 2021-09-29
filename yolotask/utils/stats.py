@@ -1,11 +1,14 @@
-from typing import Dict
+from typing import Any, Dict
 
 
-def process_stats(ad_requests: Dict[str, int], impressions: Dict[str, int]):
+def process_stats(
+    ad_requests: Dict[str, int],
+    impressions: Dict[str, int]
+) -> Dict[str, Dict[str, Any]]:
     fill_rate = {}
     for k in ad_requests:
         try:
-            fill_rate[k] = ad_requests[k] / impressions[k]
+            fill_rate[k] = impressions[k] / ad_requests[k]
         except KeyError:
             fill_rate[k] = 0
 

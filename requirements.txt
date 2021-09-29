@@ -1,8 +1,4 @@
-fastapi
-aiohttp
-aioredis
-pytest-asyncio
-uvicorn[standard]
-httpx
-pytest-mock
-asgi_lifespan
+fastapi==0.68.1
+aiohttp==3.7.4.post0
+aioredis==2.0.0
+uvicorn[standard]==0.15.0

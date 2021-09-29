@@ -1,40 +1,32 @@
-import json
-
+import aiohttp
 import pytest
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient
-from yolotask.server import app
-
-
-class MockResponse:
-    def __init__(self, text, status):
-        self._text = text
-        self.status = status
-
-    async def text(self):
-        return self._text
-
-    async def __aexit__(self, exc_type, exc, tb):
-        pass
-
-    async def __aenter__(self):
-        return self
 
 
 @pytest.mark.asyncio
-async def test_root(mocker):
-    msg = "<is>it how xml<looks>?"
-    resp = MockResponse(msg, 200)
-    mocker.patch("aiohttp.ClientSession.get", return_value=resp)
-
-    data = {
+async def test_everything():
+    body = {
         "SDK Version": "1.2",
         "SessionId": "abc",
         "Platform": "ios",
-        "User name": "another regular normal mf",
+        "User name": "everyday regular normal mf",
         "Country code": "ca",
     }
-    async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
-        response = await client.post("/GetAd", json=data)
-    assert response.status_code == 200
-    assert response.text == msg
+    async with aiohttp.ClientSession(headers={"content-type": "application/json"}) as session:
+        resp1 = await session.post("http://127.0.0.1:8000/GetAd", json=body)
+        resp2 = await session.post("http://127.0.0.1:8000/GetAd", json=body)
+
+        async with resp1, resp2:
+            assert resp1.status == 200
+            assert resp2.status == 200
+
+        response = await session.post("http://127.0.0.1:8000/Impression", json=body)
+        async with response:
+            assert response.status == 200
+
+        async with session.get("http://127.0.0.1:8000/GetStats?FilterType=user") as response:
+            data = await response.json()
+
+            user = body["User name"]
+            assert data["ad_requests"][user] == 2
+            assert data["impressions"][user] == 1
+            assert data["fill_rate"][user] == 0.5
