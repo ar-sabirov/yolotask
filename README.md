@@ -7,7 +7,7 @@
 - yolotask/utils/stats.py - functions for metric calculations
 - yolotask/db/redis_storage.py - aioredis wrapper
 
-####Implementation details:
+#### Implementation details:
 I have chosen redis as a key-value storage because it naturally fits counting requests and impressions. Counters don't use much memory so this should scale to a large number of users (just as async FastAPI app).
 
 I decided to do aggregations in GetStats with process pool as I supposed that this is not a frequent operation and reponse time is less important (e.g we check stats few times a day).
