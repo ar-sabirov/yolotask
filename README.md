@@ -14,7 +14,7 @@ I decided to do aggregations in GetStats with process pool as I supposed that th
 
 SQL storage such as Postgres could also be a viable solution, but would probably require a little more effort and some kind of task queue (or just creating tasks without awaiting the result) for GetAd and Impression. It also fits better for frequent aggregations.
 
-It is also worth mentioning that GetAd is a POST method for API to be REST-compliant (has body) and should probably be renamed. Request body field names should also be renamed, I handled this with aliases (see yolotask/models.py).
+It is also worth mentioning that GetAd is a POST method (has body) for API to be REST-compliant and should probably be renamed. Request body fields should also be renamed, I handled this with aliases (see yolotask/models.py).
 
 #### Commands
 Running:    
